@@ -109,8 +109,8 @@ export default function Login() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground">RCDU</h1>
-          <p className="mt-1 text-sm text-muted-foreground">RC District United · Portal Ciudadano</p>
+          <h1 className="text-3xl font-bold text-foreground">Venezuela RP</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Venezuela Roleplay · Portal Ciudadano</p>
         </div>
 
         {/* Card */}
@@ -149,7 +149,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground">
-          RCDU · RC District United © 2026
+          Venezuela RP · Venezuela Roleplay © 2026
         </p>
       </motion.div>
     </div>

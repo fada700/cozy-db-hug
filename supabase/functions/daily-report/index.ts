@@ -96,7 +96,7 @@ serve(async (req) => {
       description,
       color: 0x3b82f6,
       footer: {
-        text: `RCDU MDT • ${dateStr} • ${officers.length} oficial(es) • Total: ${formatDuration(totalHours)}`,
+        text: `Venezuela RP MDT • ${dateStr} • ${officers.length} oficial(es) • Total: ${formatDuration(totalHours)}`,
       },
       timestamp: now.toISOString(),
     };
@@ -106,7 +106,7 @@ serve(async (req) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: "RCDU MDT Bot",
+        username: "Venezuela RP MDT Bot",
         avatar_url: "https://cdn-icons-png.flaticon.com/512/2111/2111370.png",
         embeds: [embed],
       }),
