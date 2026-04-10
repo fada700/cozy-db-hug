@@ -22,7 +22,7 @@ export default function Onboarding() {
   const [apellidoPaterno, setApellidoPaterno] = useState("");
   const [apellidoMaterno, setApellidoMaterno] = useState("");
   const [fechaNacimiento, setFechaNacimiento] = useState("");
-  const [nacionalidad, setNacionalidad] = useState("Chilena");
+  const [nacionalidad, setNacionalidad] = useState("Venezolana");
   const [genero, setGenero] = useState("");
 
   const generateCode = () => {
@@ -39,15 +39,10 @@ export default function Onboarding() {
     return folio + "-DU" + Math.floor(Math.random() * 10);
   };
 
-  const generateRUT = () => {
+  const generateCedulaVE = () => {
+    const prefix = Math.random() > 0.5 ? "V" : "E";
     const num = Math.floor(10000000 + Math.random() * 90000000);
-    const digits = num.toString().split("").map(Number);
-    const multipliers = [2, 3, 4, 5, 6, 7];
-    let sum = 0;
-    digits.reverse().forEach((d, i) => { sum += d * multipliers[i % 6]; });
-    const remainder = 11 - (sum % 11);
-    const dv = remainder === 11 ? "0" : remainder === 10 ? "K" : remainder.toString();
-    return `${num}-${dv}`;
+    return `${prefix}-${num}`;
   };
 
   const handleSearchRoblox = async () => {
@@ -108,7 +103,7 @@ export default function Onboarding() {
     setError("");
 
     try {
-      const rut = generateRUT();
+      const rut = generateCedulaVE();
       const folio = generateFolio();
       const discordAvatar = user?.user_metadata?.discord_avatar;
 
@@ -126,7 +121,7 @@ export default function Onboarding() {
         roblox_id: robloxId?.toString() || null,
         avatar_url: discordAvatar,
         verificado: true,
-        balance: 1000000,
+        balance: 2000,
       });
 
       if (insertError) throw insertError;

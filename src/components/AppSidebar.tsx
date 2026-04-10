@@ -22,10 +22,10 @@ const navItems = [
     { icon: IdCard, label: "Mi Cédula", path: "/cedula" },
   ]},
   { label: "ECONOMÍA", items: [
-    { icon: CreditCard, label: "Banorte", path: "/banorte" },
+    { icon: CreditCard, label: "Banco Venezuela", path: "/banorte" },
   ]},
   { label: "CIUDAD", items: [
-    { icon: Store, label: "Store", path: "/store" },
+    { icon: Store, label: "Mercado", path: "/store" },
     { icon: Package, label: "Inventario", path: "/inventario" },
     { icon: AlertTriangle, label: "Emergencias 911", path: "/emergencias" },
   ]},
