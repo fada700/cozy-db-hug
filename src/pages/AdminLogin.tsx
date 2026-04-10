@@ -4,9 +4,7 @@ import { motion } from "framer-motion";
 import { Shield, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const ADMIN_EMAIL = "venezuela@roleplay.com";
-const ADMIN_PASSWORD = "vnzrp@MCK!";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -15,20 +13,33 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("admin-login", {
+        body: { email, password },
+      });
+
+      if (fnError) throw new Error("Error de conexión");
+      if (data?.error) { setError(data.error); setLoading(false); return; }
+
+      if (data?.session) {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
         sessionStorage.setItem("admin_auth", "true");
         navigate("/admin");
       } else {
-        setError("Credenciales incorrectas");
+        setError("Error inesperado");
       }
-      setLoading(false);
-    }, 500);
+    } catch (err: any) {
+      setError(err.message || "Error de conexión");
+    }
+    setLoading(false);
   };
 
   return (
