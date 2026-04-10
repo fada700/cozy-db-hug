@@ -124,6 +124,24 @@ export function useFines() {
   });
 }
 
+export function usePurchases() {
+  const { data: citizen } = useCitizen();
+  return useQuery({
+    queryKey: ["purchases", citizen?.id],
+    queryFn: async () => {
+      if (!citizen) return [];
+      const { data, error } = await supabase
+        .from("purchases")
+        .select("*")
+        .eq("citizen_id", citizen.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!citizen,
+  });
+}
+
 export function formatMoney(amount: number): string {
-  return `$${amount.toLocaleString("es-CL")}`;
+  return `$${amount.toLocaleString("en-US")}`;
 }

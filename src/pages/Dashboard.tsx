@@ -30,7 +30,7 @@ export default function Dashboard() {
   const vehicleCount = vehicles?.length ?? 0;
 
   const today = new Date();
-  const dateStr = today.toLocaleDateString("es-CL", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  const dateStr = today.toLocaleDateString("es-VE", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 
   if (isLoading) {
     return (
@@ -48,8 +48,8 @@ export default function Dashboard() {
   ];
 
   const quickActions = [
-    { icon: CreditCard, label: "Banorte", path: "/banorte", color: "text-accent" },
-    { icon: Store, label: "Tienda", path: "/store", color: "text-primary" },
+    { icon: CreditCard, label: "Banco Venezuela", path: "/banorte", color: "text-accent" },
+    { icon: Store, label: "Mercado", path: "/store", color: "text-primary" },
     { icon: Package, label: "Inventario", path: "/inventario", color: "text-destructive" },
     { icon: DollarSign, label: "Sueldos", path: "/", color: "text-warning" },
   ];
@@ -95,7 +95,7 @@ export default function Dashboard() {
           <div className="text-right">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">Balance Actual</p>
             <p className="text-3xl font-bold text-accent text-glow-emerald">{formatMoney(balance)}</p>
-            <p className="text-xs text-muted-foreground">Pesos RCDU</p>
+            <p className="text-xs text-muted-foreground">Dólares USD</p>
           </div>
         </div>
       </motion.div>

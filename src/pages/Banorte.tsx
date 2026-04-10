@@ -80,16 +80,16 @@ export default function Banorte() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-          <CreditCard className="h-6 w-6 text-primary" /> Banorte
+          <CreditCard className="h-6 w-6 text-primary" /> Banco Venezuela
         </h1>
-        <p className="text-sm text-muted-foreground">Tu billetera digital en RCDU</p>
+        <p className="text-sm text-muted-foreground">Tu billetera digital en Venezuela RP</p>
       </div>
 
       {/* Card */}
       <motion.div initial={{ opacity: 0, rotateY: -10 }} animate={{ opacity: 1, rotateY: 0 }}>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-surface-3 via-surface-2 to-surface-4 p-6 border border-border glow-blue">
           <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-primary/5 blur-3xl" />
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Banorte · RCDU</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Banco Venezuela · VRP</p>
           <p className="mt-4 text-3xl font-bold text-foreground">{formatMoney(balance)}</p>
           <p className="mt-6 font-mono text-lg tracking-[0.3em] text-muted-foreground">
             {folio !== "—" ? folio : "•••• •••• •••• ••••"}

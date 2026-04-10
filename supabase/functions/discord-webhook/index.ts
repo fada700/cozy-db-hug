@@ -26,7 +26,7 @@ serve(async (req) => {
     }
 
     const payload: Record<string, unknown> = {
-      username: "RCDU Bot",
+      username: "Venezuela RP Bot",
       avatar_url: "https://cdn-icons-png.flaticon.com/512/2111/2111370.png",
     };
     if (content) payload.content = content;

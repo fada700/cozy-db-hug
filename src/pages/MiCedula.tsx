@@ -58,7 +58,7 @@ export default function MiCedula() {
       >
         <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-surface-2 to-surface-3 p-6 glow-blue">
           <div className="text-center mb-4">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">RC District United</p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">República Bolivariana de Venezuela</p>
             <p className="text-sm font-bold text-primary uppercase tracking-wider">Cédula de Identidad</p>
           </div>
 
@@ -80,7 +80,7 @@ export default function MiCedula() {
                 { label: "APELLIDOS", value: `${citizen.apellido_paterno} ${citizen.apellido_materno}` },
                 { label: "NOMBRES", value: citizen.nombre },
                 { label: "NACIONALIDAD", value: citizen.nacionalidad },
-                { label: "FECHA NAC.", value: new Date(citizen.fecha_nacimiento).toLocaleDateString("es-CL") },
+                { label: "FECHA NAC.", value: new Date(citizen.fecha_nacimiento).toLocaleDateString("es-VE") },
               ].map((field) => (
                 <div key={field.label}>
                   <p className="text-[9px] uppercase tracking-wider text-muted-foreground">{field.label}</p>
@@ -91,7 +91,7 @@ export default function MiCedula() {
           </div>
 
           <div className="mt-4 rounded-lg bg-primary/10 border border-primary/20 px-4 py-2 text-center">
-            <p className="text-[9px] uppercase tracking-wider text-muted-foreground">DNI Folio</p>
+            <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Cédula N°</p>
             <p className="text-lg font-mono font-bold text-primary text-glow-blue">{citizen.folio_dni}</p>
           </div>
 
@@ -108,7 +108,7 @@ export default function MiCedula() {
 
           <div className="mt-4 pt-3 border-t border-border">
             <p className="text-center text-[9px] text-muted-foreground">
-              Banorte · RC District United (RCDU) · Uso exclusivo plataforma
+              Venezuela Roleplay · Cédula de Identidad Venezolana · Uso exclusivo plataforma
             </p>
           </div>
         </div>
