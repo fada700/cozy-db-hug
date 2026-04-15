@@ -529,13 +529,56 @@ function FinePanel({ officer }: { officer: Officer }) {
 }
 
 /* ===================== ARREST PANEL ===================== */
+const DURATION_OPTIONS = [
+  { label: "20 minutos", value: 20 },
+  { label: "40 minutos", value: 40 },
+  { label: "1 hora", value: 60 },
+  { label: "2 horas", value: 120 },
+  { label: "3 horas", value: 180 },
+  { label: "4 horas", value: 240 },
+  { label: "6 horas", value: 360 },
+  { label: "8 horas", value: 480 },
+  { label: "12 horas", value: 720 },
+  { label: "1 día", value: 1440 },
+];
+
+function formatTimeLeft(expira: string): string {
+  const diff = new Date(expira).getTime() - Date.now();
+  if (diff <= 0) return "Expirado";
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  if (h > 0) return `${h}h ${m}m restantes`;
+  return `${m}m restantes`;
+}
+
 function ArrestPanel({ officer }: { officer: Officer }) {
   const [citizenQuery, setCitizenQuery] = useState("");
   const [citizenResults, setCitizenResults] = useState<any[]>([]);
   const [selectedCitizen, setSelectedCitizen] = useState<any>(null);
   const [cargos, setCargos] = useState("");
+  const [duracion, setDuracion] = useState(60);
   const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [activeArrests, setActiveArrests] = useState<any[]>([]);
+  const [loadingArrests, setLoadingArrests] = useState(true);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const fetchActiveArrests = async () => {
+    const { data } = await hqSupabase
+      .from("arrests")
+      .select("*, citizens(nombre, apellido_paterno, folio_dni, roblox_nickname)")
+      .gte("expira_en", new Date().toISOString())
+      .order("expira_en", { ascending: true });
+    setActiveArrests(data || []);
+    setLoadingArrests(false);
+  };
+
+  useEffect(() => {
+    fetchActiveArrests();
+    const interval = setInterval(fetchActiveArrests, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const searchCitizen = async () => {
     if (!citizenQuery.trim()) return;
@@ -560,23 +603,44 @@ function ArrestPanel({ officer }: { officer: Officer }) {
       }
     }
 
+    const now = new Date();
+    const expira = new Date(now.getTime() + duracion * 60000);
+
     const { error } = await hqSupabase.from("arrests").insert({
       citizen_id: selectedCitizen.id,
       officer_id: officer.id,
       cargos,
       evidencia_url,
+      duracion_minutos: duracion,
+      expira_en: expira.toISOString(),
     });
 
     if (error) { toast.error(error.message); }
     else {
-      toast.success("Arresto registrado correctamente");
+      const durLabel = DURATION_OPTIONS.find(d => d.value === duracion)?.label || `${duracion} min`;
+      toast.success(`Arresto registrado — ${durLabel}`);
       setSelectedCitizen(null);
       setCargos("");
+      setDuracion(60);
       setEvidenceFile(null);
       setCitizenQuery("");
       setCitizenResults([]);
+      fetchActiveArrests();
     }
     setSubmitting(false);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    const { error } = await hqSupabase.from("arrests").delete().eq("id", deleteId);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Arresto eliminado");
+      fetchActiveArrests();
+    }
+    setDeleteId(null);
+    setDeleting(false);
   };
 
   return (
@@ -617,6 +681,22 @@ function ArrestPanel({ officer }: { officer: Officer }) {
           </div>
 
           <div>
+            <label className="mb-2 block text-sm text-slate-300">Tiempo de arresto</label>
+            <div className="grid grid-cols-3 gap-2">
+              {DURATION_OPTIONS.map((d) => (
+                <button key={d.value} onClick={() => setDuracion(d.value)}
+                  className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
+                    duracion === d.value
+                      ? "bg-red-500/20 text-red-400 border-red-500/40"
+                      : "border-white/10 text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}>
+                  {d.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <label className="mb-1 block text-sm text-slate-300">Evidencia (opcional)</label>
             <Input type="file" accept="image/*" onChange={(e) => setEvidenceFile(e.target.files?.[0] || null)}
               className="bg-white/5 border-white/10 text-white" />
@@ -625,6 +705,64 @@ function ArrestPanel({ officer }: { officer: Officer }) {
           <Button onClick={submit} disabled={submitting} className="w-full bg-red-600 hover:bg-red-700">
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Registrar Arresto"}
           </Button>
+        </div>
+      )}
+
+      {/* Active Arrests */}
+      <div className="mt-8">
+        <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+          <Gavel className="h-5 w-5 text-red-400" /> Arrestos Activos
+        </h3>
+        {loadingArrests ? <Loader2 className="h-5 w-5 animate-spin text-blue-400" /> :
+          activeArrests.length === 0 ? <p className="text-sm text-slate-500">No hay arrestos activos</p> : (
+          <div className="space-y-2">
+            {activeArrests.map((a) => {
+              const ingreso = new Date(a.created_at);
+              const expira = new Date(a.expira_en);
+              const isExpired = expira.getTime() <= Date.now();
+              return (
+                <div key={a.id} className={`rounded-xl border p-4 ${isExpired ? "border-emerald-500/30 bg-emerald-500/5" : "border-red-500/30 bg-red-500/5"}`}>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-white font-medium">{a.citizens?.nombre} {a.citizens?.apellido_paterno}</p>
+                      <p className="text-xs text-slate-400">Roblox: {a.citizens?.roblox_nickname} • DNI: {a.citizens?.folio_dni}</p>
+                      <p className="text-sm text-slate-300 mt-1">{a.cargos}</p>
+                      <div className="mt-2 text-xs text-slate-400 space-y-0.5">
+                        <p>Ingreso: {ingreso.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}</p>
+                        <p>Expiración: {expira.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}</p>
+                        <p className={isExpired ? "text-emerald-400 font-medium" : "text-amber-400 font-medium"}>
+                          {isExpired ? "✓ Cumplido" : formatTimeLeft(a.expira_en)}
+                        </p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(a.id)}
+                      className="text-red-400 hover:bg-red-500/10 hover:text-red-300">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Delete Confirmation */}
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="rounded-xl border border-red-500/30 bg-[#0a0e1a] p-6 max-w-sm w-full mx-4 space-y-4">
+            <div className="flex items-center gap-2 text-red-400">
+              <AlertTriangle className="h-5 w-5" />
+              <h3 className="font-bold text-lg">Eliminar Arresto</h3>
+            </div>
+            <p className="text-sm text-slate-300">¿Estás seguro de que quieres eliminar este arresto? Esta acción no se puede deshacer.</p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="ghost" onClick={() => setDeleteId(null)} className="text-slate-400">Cancelar</Button>
+              <Button onClick={handleDelete} disabled={deleting} className="bg-red-600 hover:bg-red-700">
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Eliminar"}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
